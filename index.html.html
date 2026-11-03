@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Black Pirates Basketball - Player Portal & Rookie Draft</title>
+    <!-- Load Tailwind CDN script FIRST before setting configuration -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        pirate: {
+                            black: '#07090e',
+                            dark: '#0f131d',
+                            card: '#161c2b',
+                            border: '#273147',
+                            red: '#e61c24',
+                            redHover: '#ff2d35',
+                            cyan: '#38bdf8',
+                            cyanDark: '#0284c7',
+                            gold: '#f59e0b'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- QRCode CDN for digital check-in QR generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #07090e;
+            color: #f1f5f9;
+        }
+        .pirate-grid-pattern {
+            background-size: 36px 36px;
+            background-image: 
+                radial-gradient(circle, rgba(56, 189, 248, 0.08) 1px, transparent 1px),
+                linear-gradient(to right, rgba(230, 28, 36, 0.03) 1px, transparent 1px);
+        }
+        .pirate-glow-red {
+            box-shadow: 0 0 25px -5px rgba(230, 28, 36, 0.45);
+        }
+        .pirate-glow-cyan {
+            box-shadow: 0 0 25px -5px rgba(56, 189, 248, 0.4);
+        }
+        .pirate-gradient-text {
+            background: linear-gradient(135deg, #ffffff 0%, #38bdf8 50%, #e61c24 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        /* Soundwave equalizer animation */
+        .eq-bar {
+            animation: eqPulse 1.2s ease-in-out infinite alternate;
+        }
+        .eq-bar:nth-child(1) { animation-delay: 0.1s; }
+        .eq-bar:nth-child(2) { animation-delay: 0.3s; }
+        .eq-bar:nth-child(3) { animation-delay: 0.5s; }
+        .eq-bar:nth-child(4) { animation-delay: 0.2s; }
+        .eq-bar:nth-child(5) { animation-delay: 0.4s; }
+        @keyframes eqPulse {
+            0% { height: 15%; }
+            100% { height: 100%; }
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #07090e; }
+        ::-webkit-scrollbar-thumb { background: #273147; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #e61c24; }
+    </style>
+</head>
+<body class="min-h-screen bg-pirate-black text-slate-100 antialiased selection:bg-pirate-red selection:text-white pirate-grid-pattern flex flex-col">
+
+    <!-- TOP MOTTO / LEAGUE ANNOUNCEMENT STRIP -->
+    <div class="bg-gradient-to-r from-pirate-black via-pirate-dark to-pirate-black text-white font-bold text-[11px] py-2 px-4 tracking-wider flex items-center justify-between border-b border-pirate-border/60">
+        <div class="max-w-7xl mx-auto w-full flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="inline-block w-2 h-2 rounded-full bg-pirate-red animate-pulse"></span>
+                <span class="uppercase tracking-widest text-slate-200">BLACK PIRATES BASKETBALL • NAGA CITY, CAMARINES SUR • FOUNDER ZURIQUE VONTROY CABO BENITO</span>
+            </div>
+            <div class="hidden md:flex items-center gap-3 text-[11px] font-bold">
+                <span class="text-pirate-cyan">INDIVIDUAL ENTRY: ₱1,800 (INCLUDES REVERSIBLE JERSEY)</span>
+                <span class="text-slate-500">•</span>
+                <span class="text-amber-400">DRAFT COMBINE ACTIVE</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN NAVBAR -->
+    <nav class="sticky top-0 z-40 bg-pirate-dark/95 backdrop-blur-md border-b border-pirate-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                
+                <!-- Brand / Logo -->
+                <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('registration')">
+                    <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-pirate-red to-pirate-black border border-pirate-red/50 flex items-center justify-center font-black text-white text-lg tracking-tighter italic shadow-lg">
+                        PB
+                    </div>
+                    <div>
+                        <div class="text-[10px] uppercase font-black tracking-widest text-pirate-cyan leading-tight">NAGA CITY, CAMARINES SUR</div>
+                        <div class="text-base font-black tracking-tight text-white uppercase italic leading-none">
+                            BLACK PIRATES <span class="text-pirate-cyan">BASKETBALL</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation Tabs -->
+                <div class="hidden lg:flex items-center gap-1.5 bg-pirate-black/80 p-1.5 rounded-xl border border-pirate-border text-xs font-black uppercase tracking-wider">
+                    <button onclick="switchTab('registration')" id="nav-registration" class="nav-btn px-4 py-2 rounded-lg text-pirate-cyan bg-pirate-card border border-pirate-cyan/30 flex items-center gap-2 transition-all">
+                        <i data-lucide="user-plus" class="w-4 h-4"></i> Registration
+                    </button>
+                    <button onclick="switchTab('schedule')" id="nav-schedule" class="nav-btn px-4 py-2 rounded-lg text-slate-400 hover:text-white flex items-center gap-2 transition-all">
+                        <i data-lucide="calendar" class="w-4 h-4"></i> Combine Schedule
+                    </button>
+                    <button onclick="switchTab('poll')" id="nav-poll" class="nav-btn px-4 py-2 rounded-lg text-slate-400 hover:text-white flex items-center gap-2 transition-all">
+                        <i data-lucide="vote" class="w-4 h-4 text-pirate-cyan"></i> Rookie Poll (0)
+                    </button>
+                    <button onclick="switchTab('roster')" id="nav-roster" class="nav-btn px-4 py-2 rounded-lg text-slate-400 hover:text-white flex items-center gap-2 transition-all">
+                        <i data-lucide="users" class="w-4 h-4"></i> Draft Pool
+                    </button>
+                </div>
+
+                <!-- Action CTA -->
+                <div class="hidden sm:flex items-center gap-3">
+                    <button onclick="switchTab('registration')" class="bg-gradient-to-r from-pirate-red to-pirate-redHover hover:from-red-600 hover:to-pirate-red text-white font-extrabold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider shadow-lg pirate-glow-red flex items-center gap-2 transition-all transform hover:-translate-y-0.5">
+                        <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                        <span>JOIN THE PIRATES (₱1,800)</span>
+                    </button>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="lg:hidden">
+                    <button onclick="toggleMobileNav()" class="text-slate-300 p-2 rounded-lg bg-pirate-card border border-pirate-border">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Mobile Drawer -->
+        <div id="mobile-drawer" class="hidden lg:hidden bg-pirate-dark border-b border-pirate-border px-4 py-4 space-y-2 text-xs uppercase font-extrabold">
+            <button onclick="switchTab('registration'); toggleMobileNav()" class="w-full text-left py-3 px-4 rounded-xl bg-pirate-card text-pirate-cyan flex items-center gap-3">
+                <i data-lucide="user-plus" class="w-5 h-5"></i> Registration
+            </button>
+            <button onclick="switchTab('schedule'); toggleMobileNav()" class="w-full text-left py-3 px-4 rounded-xl text-slate-300 flex items-center gap-3">
+                <i data-lucide="calendar" class="w-5 h-5"></i> Combine Schedule
+            </button>
+            <button onclick="switchTab('poll'); toggleMobileNav()" class="w-full text-left py-3 px-4 rounded-xl text-slate-300 flex items-center gap-3">
+                <i data-lucide="vote" class="w-5 h-5 text-pirate-cyan"></i> Rookie Poll (0)
+            </button>
+            <button onclick="switchTab('roster'); toggleMobileNav()" class="w-full text-left py-3 px-4 rounded-xl text-slate-300 flex items-center gap-3">
+                <i data-lucide="users" class="w-5 h-5"></i> Draft Pool
+            </button>
+        </div>
+    </nav>
+
+    <!-- HEADER BRANDING HERO -->
+    <header class="relative py-10 md:py-14 bg-gradient-to-b from-pirate-dark via-pirate-black to-pirate-black border-b border-pirate-border/60 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-8">
+                
+                <div class="space-y-4 text-center lg:text-left">
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-pirate-red/10 border border-pirate-red/40 text-pirate-red text-xs font-black uppercase tracking-widest">
+                        <i data-lucide="map-pin" class="w-3.5 h-3.5 fill-pirate-red"></i>
+                        <span>NAGA CITY, CAMARINES SUR • SEASON 2026</span>
+                    </div>
+
+                    <!-- Title & Integrated Pirates Logo Graphic -->
+                    <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                        <h1 class="text-4xl sm:text-6xl font-black uppercase tracking-tight italic leading-none text-white">
+                            BLACK <span class="text-pirate-red">PIRATES</span><br>
+                            <span class="text-pirate-cyan">BASKETBALL</span>
+                        </h1>
+                    </div>
+
+                    <p class="text-slate-400 text-xs sm:text-sm max-w-xl font-medium">
+                        Founded by <strong class="text-white">Zurique Vontroy Cabo Benito</strong> in Naga City, Camarines Sur. Register for the draft, verify your stats, and play for glory!
+                    </p>
+                </div>
+
+                <!-- Pricing & Package Highlight Box -->
+                <div class="w-full lg:w-auto bg-pirate-card/90 border border-pirate-cyan/30 rounded-2xl p-6 shadow-2xl pirate-glow-cyan flex flex-col sm:flex-row items-center gap-6">
+                    <div class="text-center sm:text-left">
+                        <span class="text-[10px] uppercase tracking-widest font-extrabold text-pirate-cyan block">INDIVIDUAL ENTRY FEE</span>
+                        <div class="text-3xl font-black text-white italic">₱ 1,800 <span class="text-xs font-normal text-slate-400 italic">/ Player</span></div>
+                        <span class="text-xs text-emerald-400 font-bold flex items-center gap-1 justify-center sm:justify-start mt-1">
+                            <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Reversible Jersey Included
+                        </span>
+                    </div>
+                    <div class="w-full sm:w-auto border-t sm:border-t-0 sm:border-l border-pirate-border pt-4 sm:pt-0 sm:pl-6 text-xs space-y-2 text-slate-300">
+                        <div class="flex items-center gap-2"><i data-lucide="shirt" class="w-4 h-4 text-pirate-red"></i> Dual-Side Sublimated</div>
+                        <div class="flex items-center gap-2"><i data-lucide="qr-code" class="w-4 h-4 text-pirate-cyan"></i> Digital Pass & Showcase</div>
+                        <div class="flex items-center gap-2"><i data-lucide="award" class="w-4 h-4 text-amber-400"></i> Scouting Profile & Stats</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN BODY CONTENT AREA -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- TAB 1: PLAYER REGISTRATION FORM -->
+        <div id="tab-registration" class="tab-view space-y-8">
+
+            <div class="bg-pirate-dark border border-pirate-border rounded-3xl p-6 sm:p-10 shadow-2xl space-y-8">
+                
+                <div class="border-b border-pirate-border pb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <span class="text-xs font-black text-pirate-cyan uppercase tracking-widest block">STEP 1 OF 3 • DRAFT APPLICANT REGISTRATION</span>
+                        <h2 class="text-2xl sm:text-3xl font-black uppercase text-white tracking-tight italic">
+                            OFFICIAL PLAYER REGISTRATION & SCOUTING FORM
+                        </h2>
+                    </div>
+                    <div class="px-4 py-2 bg-pirate-black border border-pirate-red/40 rounded-xl text-xs text-pirate-red font-extrabold flex items-center gap-2 self-start md:self-auto">
+                        <i data-lucide="shield-check" class="w-4 h-4 text-pirate-red"></i> Strictly Verified League Standard
+                    </div>
+                </div>
+
+                <!-- REGISTRATION FORM -->
+                <form id="player-registration-form" onsubmit="handlePlayerRegistration(event)" class="space-y-8">
+                    
+                    <!-- SECTION 1: PERSONAL INFORMATION & PHYSICAL SPECS -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 text-pirate-cyan font-extrabold text-xs uppercase tracking-wider">
+                            <i data-lucide="user" class="w-4 h-4"></i>
+                            <span>Personal Information & Physical Specs</span>
+                        </div>
+
+                        <!-- Photo Upload Box -->
+                        <div class="bg-pirate-card border border-pirate-border rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center gap-5">
+                            <div id="photo-preview-box" class="w-20 h-20 rounded-xl bg-pirate-black border border-pirate-border flex flex-col items-center justify-center text-slate-500 overflow-hidden shrink-0">
+                                <i data-lucide="image" class="w-8 h-8"></i>
+                                <span class="text-[9px] font-bold mt-1">NO PHOTO</span>
+                            </div>
+                            <div class="space-y-2 text-center sm:text-left w-full">
+                                <div class="text-xs font-extrabold text-white uppercase">PLAYER HEADSHOT / DRAFT PHOTO</div>
+                                <div class="flex flex-col sm:flex-row items-center gap-3">
+                                    <label for="player-photo-input" class="bg-pirate-cyan hover:bg-pirate-cyanDark text-black text-xs font-black px-4 py-2 rounded-xl cursor-pointer transition">
+                                        Choose File
+                                    </label>
+                                    <input type="file" id="player-photo-input" accept="image/*" onchange="previewPlayerPhoto(event)" class="hidden">
+                                    <span id="photo-file-name" class="text-xs text-slate-400 font-medium">No file chosen</span>
+                                </div>
+                                <p class="text-[11px] text-slate-400">Upload a clear front-facing headshot (PNG or JPG). Will be displayed on your Rookie Prospect card.</p>
+                            </div>
+                        </div>
+
+                        <!-- Main Form Input Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-[11px] font-extrabold text-slate-300 uppercase tracking-wider mb-1.5">FULL NAME *</label>
+                                <input type="text" id="reg-fullname" required placeholder="e.g. Juan De La Cruz" class="w-full bg-pirate-black border border-pirate-border rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-pirate-cyan">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-extrabold text-slate-300 uppercase tracking-wider mb-1.5">CONTACT NUMBER *</label>
+                                <input type="tel" id="reg-contact" required placeholder="09XX-XXX-XXXX" class="w-full bg-pirate-black border border-pirate-border rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-pirate-cyan">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-extrabold text-slate-300 uppercase tracking-wider mb-1.5">EMAIL ADDRESS *</label>
+                                <input type="email" id="reg-email" required placeholder="baller@pirates.com" class="w-full bg-pirate-black border border-pirate-border rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-pirate-cyan">
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] font-extrabold text-slate-300 uppercase tracking-wider mb-1.5">AGE *</label>
+                                <input type="number" id="reg-age" required min="16" max="60" placeholder="e.g. 24" class="w-full bg-pirate-black border border-pirate-border rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-pirate-cyan">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-extrabold text-slate-300 uppercase tracking-wider mb-1.5">HEIGHT (FT/IN OR CM) *</label>
+                                <input type="text" id="reg-height" required placeholder="e.g. 6'1&quot; or 185cm" class="w-full bg-pirate-black border border-pirate-border rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-pirate-cyan">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-extrabold text-slate-300 uppercase tracking-wider mb-1.5">PRIMARY POSITION *</label>
+                                <select id="reg-position" required class="w-full bg-pirate-black border border-pirate-border rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-pirate-cyan cursor-pointer">
+                                    <option value="SG">Shooting Guard (SG)</option>
+                                    <option value="PG">Point Guard (PG)</option>
+                                    <option value="SF">Small Forward (SF)</option>
+                                    <option value="PF">Power Forward (PF)</option>
+                                    <option value="C">Center (C)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 2: PRIMARY SCOUTING PLAYSTYLE BADGE -->
+                    <div class="space-y-3 pt-2">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2 text-pirate-cyan font-extrabold text-xs uppercase tracking-wider">
+                                <i data-lucide="award" class="w-4 h-4"></i>
+                                <span>Primary Scouting Playstyle Badge *</span>
+                            </div>
+                            <span class="text-[10px] text-slate-400">Featured on Draft Poll & Player Card</span>
+                        </div>
+
+                        <!-- Badge Grid Options -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                            
+                            <label class="badge-card cursor-pointer bg-pirate-card border border-pirate-cyan/50 rounded-2xl p-3.5 flex items-start gap-3 hover:border-pirate-cyan transition relative">
+                                <input type="radio" name="playstyle" value="3PT Specialist" checked class="hidden peer">
+                                <div class="w-8 h-8 rounded-xl bg-pirate-cyan/10 border border-pirate-cyan/40 text-pirate-cyan flex items-center justify-center shrink-0 mt-0.5 peer-checked:bg-pirate-cyan peer-checked:text-black">
+                                    <i data-lucide="crosshair" class="w-4 h-4"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-black text-white uppercase italic">3PT SPECIALIST</div>
+                                    <div class="text-[10px] text-slate-400">Sharpshooter / Perimeter</div>
+                                </div>
+                            </label>
+
+                            <label class="badge-card cursor-pointer bg-pirate-card border border-pirate-border rounded-2xl p-3.5 flex items-start gap-3 hover:border-pirate-cyan transition relative">
+                                <input type="radio" name="playstyle" value="Lockdown Defender" class="hidden peer">
+                                <div class="w-8 h-8 rounded-xl bg-pirate-red/10 border border-pirate-red/40 text-pirate-red flex items-center justify-center shrink-0 mt-0.5 peer-checked:bg-pirate-red peer-checked:text-white">
+                                    <i data-lucide="shield" class="w-4 h-4"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-black text-white uppercase italic">LOCKDOWN DEFENDER</div>
+                                    <div class="text-[10px] text-slate-400">On-Ball Stopper</div>
+                                </div>
+                            </label>
+
+                            <label class="badge-card cursor-pointer bg-pirate-card border border-pirate-border rounded-2xl p-3.5 flex items-start gap-3 hover:border-pirate-cyan transition relative">
+                                <input type="radio" name="playstyle" value="Floor General" class="hidden peer">
+                                <div class="w-8 h-8 rounded-xl bg-amber-400/10 border border-amber-400/40 text-amber-400 flex items-center justify-center shrink-0 mt-0.5 peer-checked:bg-amber-400 peer-checked:text-black">
+                                    <i data-lucide="compass" class="w-4 h-4"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-black text-white uppercase italic">FLOOR GENERAL</div>
+                                    <div class="text-[10px] text-slate-400">Playmaker & Vision</div>
+                                </div>
+                            </label>
+
+                            <label class="badge-card cursor-pointer bg-pirate-card border border-pirate-border rounded-2xl p-3.5 flex items-start gap-3 hover:border-pirate-cyan transition relative">
+                                <input type="radio" name="playstyle" value="Rebound Machine" class="hidden peer">
+                                <div class="w-8 h-8 rounded-xl bg-emerald-400/10 border border-emerald-400/40 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5 peer-checked:bg-emerald-400 peer-checked:text-black">
+                                    <i data-lucide="disc" class="w-4 h-4"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-black text-white uppercase italic">REBOUND MACHINE</div>
+                                    <div class="text-[10px] text-slate-400">Glass Cleaner</div>
+                                </div>
+                            </label>
+
+                            <label class="badge-card cursor-pointer bg-pirate-card border border-pirate-border rounded-2xl p-3.5 flex items-start gap-3 hover:border-pirate-cyan transition relative">
+                                <input type="radio" name="playstyle" value="Rim Protector" class="hidden peer">
+                                <div class="w-8 h-8 rounded-xl bg-purple-400/10 border border-purple-400/40 text-purple-400 flex items-center justify-center shrink-0 mt-0.5 peer-checked:bg-purple-400 peer-checked:text-white">
+                                    <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-black text-white uppercase italic">RIM PROTECTOR</div>
+                                    <div class="text-[10px] text-slate-400">Paint Eraser & Blocks</div>
+                                </div>
+                            </label>
+
+                            <label class="badge-card cursor-pointer bg-pirate-card border border-pirate-border rounded-2xl p-3.5 flex items-start gap-3 hover:border-pirate-cyan transition relative">
+                                <input type="radio" name="playstyle" value="Slasher & Finisher" class="hidden peer">
+                                <div class="w-8 h-8 rounded-xl bg-blue-400/10 border border-blue-400/40 text-blue-400 flex items-center justify-center shrink-0 mt-0.5 peer-checked:bg-blue-400 peer-checked:text-white">
+                                    <i data-lucide="zap" class="w-4 h-4"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-black text-white uppercase italic">SLASHER & FINISHER</div>
+                                    <div class="text-[10px] text-slate-400">Drive to the Rim</div>
+                                </div>
+                            </label>
+
+                            <label class="badge-card cursor-pointer bg-pirate-card border border-pirate-border rounded-2xl p-3.5 flex items-start gap-3 hover:border-pirate-cyan transition relative">
+                                <input type="radio" name="playstyle" value="Mid-Range Maestro" class="hidden peer">
+                                <div class="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/40 text-amber-500 flex items-center justify-center shrink-0 mt-0.5 peer-checked:bg-amber-500 peer-checked:text-black">
+                                    <i data-lucide="target" class="w-4 h-4"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-black text-white uppercase italic">MID-RANGE MAESTRO</div>
+                                    <div class="text-[10px] text-slate-400">Pull-Up Specialist</div>
+                                </div>
+                            </label>
+
+                        </div>
+                    </div>
+
+                    <!-- SECTION 3: REVERSIBLE JERSEY CUSTOMIZATION -->
+                    <div class="bg-pirate-card border border-pirate-cyan/30 rounded-2xl p-5 space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-pirate-border pb-3">
+                            <div>
+                                <span class="text-[10px] font-black text-pirate-cyan uppercase tracking-widest block">INCLUDED IN YOUR ₱1,800 REGISTRATION</span>
+                                <div class="text-sm font-black text-white uppercase italic flex items-center gap-2">
+                                    <i data-lucide="shirt" class="w-4 h-4 text-pirate-red"></i> CUSTOM DUAL-SIDED REVERSIBLE JERSEY CUSTOMIZATION
+                                </div>
+                            </div>
+                            <span class="bg-pirate-cyan/10 border border-pirate-cyan/30 text-pirate-cyan text-[10px] font-black px-3 py-1 rounded-full uppercase self-start sm:self-auto">
+                                Dual Sublimation (Black Pirates Edition)
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-[11px] font-extrabold text-slate-300 uppercase tracking-wider mb-1.5">JERSEY SIZE *</label>
+                                <select id="jersey-size" required class="w-full bg-pirate-black border border-pirate-border rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-pirate-cyan cursor-pointer">
+                                    <option value="Large (L)">Large (L)</option>
+                                    <option value="Medium (M)">Medium (M)</option>
+                                    <option value="Small (S)">Small (S)</option>
+                                    <option value="XL">Extra Large (XL)</option>
+                                    <option value="2XL">2XL</option>
+                                    <option value="3XL">3XL</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-extrabold text-slate-300 uppercase tracking-wider mb-1.5">PREFERRED # (1ST CHOICE) *</label>
+                                <input type="number" id="jersey-num-1" required min="0" max="99" placeholder="e.g. 23" class="w-full bg-pirate-black border border-pirate-border rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-pirate-cyan">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-extrabold text-slate-300 uppercase tracking-wider mb-1.5">PREFERRED # (2ND CHOICE)</label>
+                                <input type="number" id="jersey-num-2" min="0" max="99" placeholder="e.g. 7" class="w-full bg-pirate-black border border-pirate-border rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-pirate-cyan">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-extrabold text-slate-300 uppercase tracking-wider mb-1.5">CUSTOM NAME BACK *</label>
+                                <input type="text" id="jersey-name-back" required placeholder="E.G. DE LA CRUZ" class="w-full bg-pirate-black border border-pirate-border rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-pirate-cyan uppercase">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 4: VETERAN LEAGUE HISTORY VERIFICATION -->
+                    <div class="space-y-4 pt-2">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2 text-pirate-cyan font-extrabold text-xs uppercase tracking-wider">
+                                <i data-lucide="history" class="w-4 h-4"></i>
+                                <span>Veteran League History Verification</span>
+                            </div>
+                            <span class="text-[10px] text-amber-400 font-bold">(Leave blank if inaugural rookie season)</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-1">SEASON 1 (INAUGURAL 2022) TEAM</label>
+                                <input type="text" placeholder="Team name or N/A" class="w-full bg-pirate-black border border-pirate-border rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-pirate-cyan">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 5: SECURITY CHECK & SUBMIT -->
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-pirate-border">
+                        <div class="flex items-center gap-3 w-full sm:w-auto">
+                            <span class="text-xs font-extrabold text-slate-300 shrink-0">Security Check: What is 7 + 5? *</span>
+                            <input type="number" id="captcha-answer" required placeholder="?" class="w-20 bg-pirate-black border border-pirate-border rounded-xl px-3 py-2 text-center text-xs font-bold text-white focus:outline-none focus:border-pirate-cyan">
+                        </div>
+
+                        <button type="submit" class="w-full sm:w-auto bg-gradient-to-r from-pirate-red to-pirate-redHover hover:from-red-600 hover:to-pirate-red text-white font-black px-8 py-3.5 rounded-2xl text-xs uppercase tracking-wider shadow-2xl pirate-glow-red flex items-center justify-center gap-2 transition-all transform hover:-translate-y-0.5">
+                            <i data-lucide="send" class="w-4 h-4"></i>
+                            <span>SUBMIT PLAYER REGISTRATION (₱1,800)</span>
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+
+        <!-- TAB 2: ROOKIE SHOWCASE COMBINE SCHEDULE -->
+        <div id="tab-schedule" class="tab-view hidden space-y-8">
+            <div class="bg-pirate-dark border border-pirate-border rounded-3xl p-6 sm:p-10 space-y-8">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-pirate-border pb-6">
+                    <div>
+                        <span class="text-xs font-black text-pirate-cyan uppercase tracking-widest block">MANDATORY SCOUTING SCHEDULE</span>
+                        <h2 class="text-2xl sm:text-3xl font-black uppercase text-white tracking-tight italic">
+                            ROOKIE SHOWCASE COMBINE & PICKUP SESSIONS
+                        </h2>
+                    </div>
+                    <div class="px-4 py-2 bg-amber-500/10 border border-amber-500/30 rounded-xl text-xs text-amber-400 font-extrabold flex items-center gap-2">
+                        <i data-lucide="alert-circle" class="w-4 h-4"></i> 2 Sessions Required Prior to Draft
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-pirate-card border border-pirate-cyan/40 rounded-2xl p-6 space-y-6 flex flex-col justify-between pirate-glow-cyan relative overflow-hidden">
+                        <div class="absolute top-0 right-0 bg-pirate-cyan text-black text-[10px] font-black px-4 py-1 rounded-bl-xl uppercase tracking-widest">
+                            SESSION 1
+                        </div>
+                        <div class="space-y-4 pt-2">
+                            <span class="text-xs font-extrabold text-pirate-cyan uppercase tracking-wider block">Official Scouting Combine</span>
+                            <h3 class="text-xl font-black text-white uppercase italic">Black Pirates Combine Day 1</h3>
+                            <div class="space-y-2 text-xs text-slate-300">
+                                <div class="flex items-center gap-2.5">
+                                    <i data-lucide="calendar" class="w-4 h-4 text-pirate-cyan"></i>
+                                    <span>November 1, 2026 • 6:00 PM Onwards</span>
+                                </div>
+                                <div class="flex items-center gap-2.5">
+                                    <i data-lucide="map-pin" class="w-4 h-4 text-pirate-red"></i>
+                                    <span>Pirates Basketball Gymnasium, Main Avenue, Naga City</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="openCheckinModal('Session 1 - Nov 1, 6:00 PM')" class="bg-pirate-cyan text-black font-extrabold py-2 rounded-lg text-xs uppercase flex items-center justify-center gap-2">
+                            <i data-lucide="qr-code" class="w-4 h-4"></i> Get Digital Pass
+                        </button>
+                    </div>
+
+                    <div class="bg-pirate-card border border-pirate-red/40 rounded-2xl p-6 space-y-6 flex flex-col justify-between pirate-glow-red relative overflow-hidden">
+                        <div class="absolute top-0 right-0 bg-pirate-red text-white text-[10px] font-black px-4 py-1 rounded-bl-xl uppercase tracking-widest">
+                            SESSION 2
+                        </div>
+                        <div class="space-y-4 pt-2">
+                            <span class="text-xs font-extrabold text-pirate-red uppercase tracking-wider block">Final Draft Scrimmages</span>
+                            <h3 class="text-xl font-black text-white uppercase italic">Black Pirates Final Draft Run</h3>
+                            <div class="space-y-2 text-xs text-slate-300">
+                                <div class="flex items-center gap-2.5">
+                                    <i data-lucide="calendar" class="w-4 h-4 text-pirate-cyan"></i>
+                                    <span>November 8, 2026 • 5:30 PM Onwards</span>
+                                </div>
+                                <div class="flex items-center gap-2.5">
+                                    <i data-lucide="map-pin" class="w-4 h-4 text-pirate-red"></i>
+                                    <span>Central Sports Arena, Naga City Court A</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="openCheckinModal('Session 2 - Nov 8, 5:30 PM')" class="bg-pirate-red text-white font-extrabold py-2 rounded-lg text-xs uppercase flex items-center justify-center gap-2">
+                            <i data-lucide="qr-code" class="w-4 h-4"></i> Get Digital Pass
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: COMMUNITY SCOUT VOTING / PROSPECT PICK POLL -->
+        <div id="tab-poll" class="tab-view hidden space-y-8">
+            <div class="bg-pirate-dark border border-pirate-border rounded-3xl p-6 sm:p-10 space-y-8">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-pirate-border pb-6">
+                    <div>
+                        <span class="text-xs font-black text-pirate-cyan uppercase tracking-widest block">COMMUNITY SCOUT VOTING</span>
+                        <h2 class="text-2xl sm:text-3xl font-black uppercase text-white tracking-tight italic">
+                            TOP ROOKIE PROSPECTS FOR PICK POLL
+                        </h2>
+                    </div>
+                    <div class="px-4 py-2 bg-pirate-card border border-pirate-border rounded-xl text-xs text-pirate-cyan font-bold flex items-center gap-2">
+                        <i data-lucide="vote" class="w-4 h-4 text-pirate-cyan"></i>
+                        <span>Total Votes Cast: <strong id="total-poll-votes" class="text-white">0</strong></span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4 justify-between items-center">
+                    <div class="relative w-full sm:w-80">
+                        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-3"></i>
+                        <input type="text" id="poll-search" oninput="filterProspectPoll()" placeholder="Search prospect name..." class="w-full bg-pirate-card border border-pirate-border rounded-xl pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-pirate-cyan">
+                    </div>
+                </div>
+
+                <div id="prospect-poll-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: DRAFT POOL DIRECTORY -->
+        <div id="tab-roster" class="tab-view hidden space-y-8">
+            <div class="bg-pirate-dark border border-pirate-border rounded-3xl p-6 sm:p-10 space-y-8">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-pirate-border pb-6">
+                    <div>
+                        <span class="text-xs font-black text-pirate-cyan uppercase tracking-widest block">SEASON 2026 DRAFT POOL</span>
+                        <h2 class="text-2xl sm:text-3xl font-black uppercase text-white tracking-tight italic">
+                            REGISTERED BALLERS & SCOUTING PROFILES
+                        </h2>
+                    </div>
+                    <span class="text-xs text-slate-400">Total Applicants: <strong id="total-draft-count" class="text-pirate-cyan">24</strong></span>
+                </div>
+
+                <div class="flex flex-wrap gap-2 text-xs font-bold">
+                    <button onclick="filterRosterByPos('ALL')" id="pos-ALL" class="pos-filter-btn px-4 py-2 rounded-xl bg-pirate-cyan text-black font-extrabold transition">ALL POSITIONS</button>
+                    <button onclick="filterRosterByPos('PG')" id="pos-PG" class="pos-filter-btn px-4 py-2 rounded-xl bg-pirate-card text-slate-300 border border-pirate-border hover:border-pirate-cyan transition">PG</button>
+                    <button onclick="filterRosterByPos('SG')" id="pos-SG" class="pos-filter-btn px-4 py-2 rounded-xl bg-pirate-card text-slate-300 border border-pirate-border hover:border-pirate-cyan transition">SG</button>
+                    <button onclick="filterRosterByPos('SF')" id="pos-SF" class="pos-filter-btn px-4 py-2 rounded-xl bg-pirate-card text-slate-300 border border-pirate-border hover:border-pirate-cyan transition">SF</button>
+                    <button onclick="filterRosterByPos('PF')" id="pos-PF" class="pos-filter-btn px-4 py-2 rounded-xl bg-pirate-card text-slate-300 border border-pirate-border hover:border-pirate-cyan transition">PF</button>
+                    <button onclick="filterRosterByPos('C')" id="pos-C" class="pos-filter-btn px-4 py-2 rounded-xl bg-pirate-card text-slate-300 border border-pirate-border hover:border-pirate-cyan transition">C</button>
+                </div>
+
+                <div id="roster-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-pirate-dark border-t border-pirate-border py-10 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-pirate-red/20 border border-pirate-red/40 flex items-center justify-center text-pirate-red font-black text-lg italic">
+                    P
+                </div>
+                <div>
+                    <div class="text-sm font-black text-white tracking-wider uppercase">BLACK PIRATES BASKETBALL LEAGUE</div>
+                    <div class="text-xs text-slate-400">Naga City, Camarines Sur • Founder Zurique Vontroy Cabo Benito</div>
+                </div>
+            </div>
+            <div class="text-xs text-slate-500">
+                &copy; 2026 Black Pirates Basketball. All Rights Reserved. League Rules Enforced.
+            </div>
+        </div>
+    </footer>
+
+    <!-- DIGITAL QR PASS MODAL -->
+    <div id="qr-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm">
+        <div class="relative bg-pirate-dark border border-pirate-cyan/50 rounded-3xl max-w-sm w-full p-6 text-center space-y-5 pirate-glow-cyan">
+            <button onclick="closeCheckinModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            
+            <div class="w-12 h-12 mx-auto rounded-2xl bg-pirate-cyan/20 border border-pirate-cyan/40 text-pirate-cyan flex items-center justify-center">
+                <i data-lucide="qr-code" class="w-6 h-6"></i>
+            </div>
+
+            <div>
+                <span class="text-[10px] font-black uppercase text-pirate-cyan tracking-widest block">ATTENDANCE CHECK-IN PASS</span>
+                <h3 id="qr-session-title" class="text-base font-black text-white uppercase italic mt-1">Showcase Session Pass</h3>
+            </div>
+
+            <!-- QR Container -->
+            <div class="bg-white p-4 rounded-2xl inline-block mx-auto shadow-inner">
+                <div id="qrcode-canvas" class="flex justify-center"></div>
+            </div>
+
+            <p class="text-xs text-slate-400">Present this digital code to the scorer's table upon arrival at the gym for combine tracking.</p>
+
+            <button onclick="closeCheckinModal()" class="w-full bg-pirate-cyan hover:bg-pirate-cyanDark text-black font-extrabold py-2.5 rounded-xl text-xs uppercase">
+                Close Pass
+            </button>
+        </div>
+    </div>
+
+    <!-- NOTIFICATION TOAST -->
+    <div id="pirate-toast" class="fixed bottom-6 right-6 z-50 hidden bg-gradient-to-r from-pirate-red to-pirate-redHover text-white px-6 py-4 rounded-2xl shadow-2xl font-bold text-sm flex items-center gap-3 pirate-glow-red">
+        <i data-lucide="check-circle-2" class="w-5 h-5 text-white"></i>
+        <span id="toast-msg">Registration Submitted Successfully!</span>
+    </div>
+
+    <!-- JAVASCRIPT APP LOGIC -->
+    <script>
+        // Empty prospects array for fresh player registrations
+        let prospects = [];
+
+        let currentUploadedPhoto = null;
+        let votedProspects = new Set();
+        let totalVotesCount = 0;
+
+        window.onload = function() {
+            lucide.createIcons();
+            renderPollGrid();
+            renderRosterGrid();
+        };
+
+        // Live Image Preview Handler
+        function previewPlayerPhoto(event) {
+            const file = event.target.files[0];
+            if (file) {
+                document.getElementById('photo-file-name').innerText = file.name;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentUploadedPhoto = e.target.result;
+                    const previewBox = document.getElementById('photo-preview-box');
+                    previewBox.innerHTML = `<img src="${currentUploadedPhoto}" class="w-full h-full object-cover rounded-xl" alt="Preview">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Render Draft Pool Directory
+        let currentPosFilter = 'ALL';
+
+        function filterRosterByPos(pos) {
+            currentPosFilter = pos;
+            document.querySelectorAll('.pos-filter-btn').forEach(btn => {
+                btn.classList.remove('bg-pirate-cyan', 'text-black', 'font-extrabold');
+                btn.classList.add('bg-pirate-card', 'text-slate-300');
+            });
+
+            const activeBtn = document.getElementById(`pos-${pos}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-pirate-card', 'text-slate-300');
+                activeBtn.classList.add('bg-pirate-cyan', 'text-black', 'font-extrabold');
+            }
+
+            renderRosterGrid();
+        }
+
+        // Switch Navigation Tabs
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-view').forEach(view => view.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-pirate-cyan', 'bg-pirate-card', 'border', 'border-pirate-cyan/30');
+                btn.classList.add('text-slate-400');
+            });
+
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if (activeNav) {
+                activeNav.classList.remove('text-slate-400');
+                activeNav.classList.add('text-pirate-cyan', 'bg-pirate-card', 'border', 'border-pirate-cyan/30');
+            }
+        }
+
+        // Toggle Mobile Nav Drawer
+        function toggleMobileNav() {
+            const drawer = document.getElementById('mobile-drawer');
+            drawer.classList.toggle('hidden');
+        }
+
+        // Filter Prospect Poll Search
+        function filterProspectPoll() {
+            const query = document.getElementById('poll-search').value;
+            renderPollGrid(query);
+        }
+
+        // Cast Vote in Rookie Poll
+        function castVote(id) {
+            if (votedProspects.has(id)) return;
+
+            const prospect = prospects.find(p => p.id === id);
+            if (prospect) {
+                prospect.votes += 1;
+                votedProspects.add(id);
+                totalVotesCount += 1;
+
+                document.getElementById('total-poll-votes').innerText = totalVotesCount.toLocaleString();
+
+                renderPollGrid(document.getElementById('poll-search').value);
+                renderRosterGrid();
+                showToast(`Vote recorded for ${prospect.name}!`);
+            }
+        }
+
+        // Render Prospect Voting Poll Grid
+        function renderPollGrid(filterText = '') {
+            const container = document.getElementById('prospect-poll-grid');
+            container.innerHTML = '';
+
+            const filtered = prospects.filter(p => p.name.toLowerCase().includes(filterText.toLowerCase()));
+
+            filtered.forEach(p => {
+                const isVoted = votedProspects.has(p.id);
+                const voteBtnState = isVoted 
+                    ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-pirate-border' 
+                    : 'bg-pirate-cyan hover:bg-pirate-cyanDark text-black font-extrabold';
+
+                const avatarHtml = p.photo 
+                    ? `<img src="${p.photo}" class="w-12 h-12 rounded-xl object-cover border border-pirate-cyan/40" alt="${p.name}">`
+                    : `<div class="w-12 h-12 rounded-xl bg-pirate-dark border border-pirate-border flex items-center justify-center text-slate-500 font-black text-sm uppercase">${p.name.substring(0, 2)}</div>`;
+
+                const cardHtml = `
+                    <div class="bg-pirate-card border border-pirate-border rounded-2xl p-4 space-y-3 flex flex-col justify-between hover:border-pirate-cyan/40 transition">
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-3">
+                                ${avatarHtml}
+                                <div class="overflow-hidden">
+                                    <h4 class="text-sm font-black text-white uppercase italic truncate">${p.name}</h4>
+                                    <span class="text-[10px] text-slate-400 font-bold block">AGE ${p.age} • ${p.height}</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <span class="bg-pirate-black text-pirate-cyan border border-pirate-cyan/30 text-[10px] font-black px-2.5 py-0.5 rounded-full">
+                                    ${p.pos}
+                                </span>
+                                <div class="text-[10px] font-bold text-pirate-red bg-pirate-red/10 border border-pirate-red/20 px-2 py-0.5 rounded-lg">
+                                    ${p.specialty}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-2 border-t border-pirate-border space-y-2">
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-slate-400 font-bold">Votes</span>
+                                <span class="text-pirate-cyan font-black" id="vote-count-${p.id}">${p.votes}</span>
+                            </div>
+
+                            <button onclick="castVote(${p.id})" ${isVoted ? 'disabled' : ''} class="w-full ${voteBtnState} py-2 rounded-xl text-xs uppercase tracking-wider transition flex items-center justify-center gap-1.5">
+                                <i data-lucide="${isVoted ? 'check' : 'thumbs-up'}" class="w-3.5 h-3.5"></i>
+                                <span>${isVoted ? 'Voted' : 'Cast Vote'}</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', cardHtml);
+            });
+
+            lucide.createIcons();
+        }
+
+        function renderRosterGrid() {
+            const container = document.getElementById('roster-grid');
+            container.innerHTML = '';
+
+            const list = currentPosFilter === 'ALL' 
+                ? prospects 
+                : prospects.filter(p => p.pos === currentPosFilter);
+
+            document.getElementById('total-draft-count').innerText = prospects.length;
+
+            if (list.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 font-bold">No draft applicants found for position ${currentPosFilter}.</div>`;
+                return;
+            }
+
+            list.forEach(p => {
+                const avatarHtml = p.photo 
+                    ? `<img src="${p.photo}" class="w-14 h-14 rounded-xl object-cover border border-pirate-cyan/40" alt="${p.name}">`
+                    : `<div class="w-14 h-14 rounded-xl bg-pirate-dark border border-pirate-border flex items-center justify-center text-slate-500 font-black text-base uppercase">${p.name.substring(0, 2)}</div>`;
+
+                const cardHtml = `
+                    <div class="bg-pirate-card border border-pirate-border rounded-2xl p-5 space-y-4 hover:border-pirate-cyan/50 transition">
+                        <div class="flex items-center justify-between gap-3">
+                            <div class="flex items-center gap-3">
+                                ${avatarHtml}
+                                <div>
+                                    <h4 class="text-base font-black text-white uppercase italic">${p.name}</h4>
+                                    <span class="text-xs text-pirate-cyan font-bold">${p.specialty}</span>
+                                </div>
+                            </div>
+                            <span class="w-10 h-10 rounded-xl bg-pirate-red text-white font-black text-sm flex items-center justify-center italic shrink-0">
+                                ${p.pos}
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 text-xs border-y border-pirate-border py-3 text-slate-300">
+                            <div>Height: <strong class="text-white">${p.height}</strong></div>
+                            <div>Age: <strong class="text-white">${p.age} yrs</strong></div>
+                            <div>Jersey #: <strong class="text-pirate-cyan">#${p.jerseyChoice}</strong></div>
+                            <div>Size: <strong class="text-white">${p.jerseySize}</strong></div>
+                        </div>
+
+                        <div class="flex items-center justify-between text-[11px] text-slate-400">
+                            <span class="flex items-center gap-1"><i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i> Fee Paid (₱1,800)</span>
+                            <span class="text-pirate-cyan font-bold">${p.votes} Poll Votes</span>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', cardHtml);
+            });
+
+            lucide.createIcons();
+        }
+
+        // Handle Registration Form Submission
+        function handlePlayerRegistration(e) {
+            e.preventDefault();
+
+            const answer = parseInt(document.getElementById('captcha-answer').value);
+            if (answer !== 12) {
+                alert('Incorrect Security Captcha answer (7 + 5 = 12). Please try again.');
+                return;
+            }
+
+            const name = document.getElementById('reg-fullname').value;
+            const pos = document.getElementById('reg-position').value;
+            const age = parseInt(document.getElementById('reg-age').value);
+            const height = document.getElementById('reg-height').value;
+            const playstyleElem = document.querySelector('input[name="playstyle"]:checked');
+            const playstyle = playstyleElem ? playstyleElem.value : '3PT Specialist';
+            const jerseyChoice = document.getElementById('jersey-num-1').value || '00';
+            const jerseySize = document.getElementById('jersey-size').value;
+
+            const newProspect = {
+                id: prospects.length + 1,
+                name: name,
+                pos: pos,
+                specialty: playstyle,
+                height: height,
+                age: age,
+                votes: 0,
+                jerseyChoice: jerseyChoice,
+                jerseySize: jerseySize,
+                photo: currentUploadedPhoto
+            };
+
+            prospects.unshift(newProspect);
+
+            renderPollGrid();
+            renderRosterGrid();
+
+            document.getElementById('player-registration-form').reset();
+            currentUploadedPhoto = null;
+            document.getElementById('photo-file-name').innerText = 'No file chosen';
+            document.getElementById('photo-preview-box').innerHTML = `
+                <i data-lucide="image" class="w-8 h-8"></i>
+                <span class="text-[9px] font-bold mt-1">NO PHOTO</span>
+            `;
+            lucide.createIcons();
+
+            showToast(`Registration Complete for ${name}! Photo & details added.`);
+            switchTab('poll');
+        }
+
+        // Checkin Modal & QR Generator
+        function openCheckinModal(sessionTitle) {
+            document.getElementById('qr-session-title').innerText = sessionTitle;
+            const container = document.getElementById('qrcode-canvas');
+            container.innerHTML = '';
+
+            // Generate simple QR code for check-in
+            new QRCode(container, {
+                text: "PIRATES-COMBINE-" + Math.floor(100000 + Math.random() * 900000),
+                width: 140,
+                height: 140
+            });
+
+            document.getElementById('qr-modal').classList.remove('hidden');
+        }
+
+        function closeCheckinModal() {
+            document.getElementById('qr-modal').classList.add('hidden');
+        }
+
+        // Toast Helper
+        function showToast(msg) {
+            const toast = document.getElementById('pirate-toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('hidden');
+
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
